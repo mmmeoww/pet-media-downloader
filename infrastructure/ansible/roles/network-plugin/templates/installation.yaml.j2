@@ -1,0 +1,12 @@
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+
+spec:
+  calicoNetwork:
+    ipPools:
+      - cidr: {{ pod_network_cidr }}
+        encapsulation: {{ calico_encapsulation_mode }}
+        natOutgoing: {{ calico_nat_outgoing }}
+        nodeSelector: "{{ calico_node_selector }}"

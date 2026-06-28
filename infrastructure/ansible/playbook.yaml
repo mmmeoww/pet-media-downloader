@@ -1,0 +1,26 @@
+---
+- name: Container runtime and packages
+  hosts: k8s
+  roles:
+    - containerd
+    - packages
+
+- name: Initialize control plane
+  hosts: control-plane
+  roles:
+    - kubernetes-master
+
+- name: Join workers
+  hosts: workers
+  roles:
+    - kubernetes-worker
+
+- name: Install network plugin
+  hosts: control-plane
+  roles:
+    - network-plugin
+
+- name: Fetch local kubeconfig
+  hosts: control-plane
+  roles:
+    - kubeconfig

@@ -1,0 +1,10 @@
+k8s_version: "1.30.6"
+cluster_name: "pet-project-cluster"
+kube_api_endpoint: "{{ hostvars[groups['control-plane'][0]]['ansible_host'] }}"
+untaint_master: true
+pod_network_cidr: "10.244.0.0/16"
+service_cidr: "10.96.0.0/12"
+calico_encapsulation_mode: "VXLAN"
+calico_nat_outgoing: "Enabled"
+calico_node_selector: "all()"
+calico_version: "v3.26.0"

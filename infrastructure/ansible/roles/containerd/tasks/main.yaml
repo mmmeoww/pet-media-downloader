@@ -1,0 +1,46 @@
+---
+- name: turn off swap
+  ansible.builtin.shell: |
+    swapoff -a
+    sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+- name: overlay and br_netfilter modules
+  ansible.builtin.shell: |
+    modprobe overlay
+    modprobe br_netfilter
+
+- name: set sysctl params
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/kubernetes.conf
+    content: |
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.bridge.bridge-nf-call-iptables = 1
+      net.ipv4.ip_forward = 1
+    owner: "root"
+    group: "root"
+    mode: 0644
+
+- name: reload sysctl
+  ansible.builtin.shell: sysctl --system
+
+- name: install containerd
+  ansible.builtin.apt:
+    name: containerd
+    state: present
+
+- name: configure containerd
+  ansible.builtin.shell: |
+    mkdir -p /etc/containerd
+    containerd config default | tee /etc/containerd/config.toml
+  args:
+    creates: /etc/containerd/config.toml
+
+- name: systemd Cgroup driver
+  ansible.builtin.shell: |
+    sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+
+- name: restart containerd
+  ansible.builtin.systemd_service:
+    name: containerd
+    state: restarted
+

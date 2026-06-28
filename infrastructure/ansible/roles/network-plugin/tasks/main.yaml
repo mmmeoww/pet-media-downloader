@@ -1,0 +1,34 @@
+- name: add calico helm repo
+  ansible.builtin.shell: helm repo add projectcalico https://docs.tigera.io/calico/charts 2>/dev/null || true
+
+- name: update helm repo
+  ansible.builtin.shell: helm repo update
+
+- name: install calico helm chart
+  ansible.builtin.shell: |
+    helm upgrade --install calico projectcalico/tigera-operator \
+      --namespace calico-system \
+      --create-namespace \
+      --version {{ calico_version }} 
+
+- name: Render Calico Installation manifest
+  ansible.builtin.template:
+    src: installation.yaml.j2
+    dest: /tmp/calico-installation.yaml
+
+- name: Apply Calico Installation
+  ansible.builtin.shell: kubectl apply -f /tmp/calico-installation.yaml
+
+- name: Wait for calico-node rollout
+  ansible.builtin.shell: kubectl rollout status daemonset/calico-node -n calico-system
+  register: calico_node
+  retries: 30
+  delay: 10
+  until: calico_node.rc == 0
+
+- name: Wait for calico-kube-controllers rollout
+  ansible.builtin.shell: kubectl rollout status deployment/calico-kube-controllers -n calico-system
+  register: calico_controllers
+  retries: 30
+  delay: 10
+  until: calico_controllers.rc == 0

@@ -1,0 +1,22 @@
+---
+- name: Create kubeconfig directory
+  delegate_to: localhost
+  become: false
+  file:
+    path: "{{ lookup('env','HOME') }}/.kube/clusters"
+    state: directory
+    mode: "0700"
+
+- name: Fetch kubeconfig
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ lookup('env','HOME') }}/.kube/clusters/{{ cluster_name }}.yaml"
+    flat: true
+
+- name: Update API server endpoint
+  delegate_to: localhost
+  become: false
+  replace:
+    path: "{{ lookup('env','HOME') }}/.kube/clusters/{{ cluster_name }}.yaml"
+    regexp: 'server: https://.*:6443'
+    replace: 'server: https://{{ kube_api_endpoint }}:6443'

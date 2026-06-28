@@ -1,2 +1,0 @@
-# pet-media-downloader
-project
