@@ -1,4 +1,5 @@
 k8s_version: "1.30.6"
+k8s_repo_version: "v1.30"
 cluster_name: "pet-project-cluster"
 kube_api_endpoint: "{{ hostvars[groups['control-plane'][0]]['ansible_host'] }}"
 untaint_master: true

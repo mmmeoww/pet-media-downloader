@@ -19,15 +19,15 @@
 
 - name: Add k8s GPG key
   ansible.builtin.shell: |
-    curl -fsSL https://pkgs.k8s.io/core:/stable:/{{ k8s_version }}/deb/Release.key |
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/deb/Release.key |
       gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
   args:
-    creates: /usr/share/keyrings/kubernetes-archive-keyring.gpg
     executable: /bin/bash
+    creates: /usr/share/keyrings/kubernetes-archive-keyring.gpg
 
 - name: Add k8s apt repo
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/{{ k8s_version }}/deb/ /"
+    repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/deb/ /"
     state: present
     filename: kubernetes
 
@@ -39,13 +39,17 @@
     - kubelet
     - kubeadm
 
-- name: install kubectl/helm to control plane
+- name: install kubectl to control plane
   ansible.builtin.apt:
-    name: "{{ item }}"
+    name: kubectl
     state: present
-  loop:
-    - kubectl
-    - helm
+  when: inventory_hostname in groups['control-plane']
+
+- name: install helm
+  ansible.builtin.shell: |
+    curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  args:
+    creates: /usr/local/bin/helm
   when: inventory_hostname in groups['control-plane']
 
 - name: hold pckgs version

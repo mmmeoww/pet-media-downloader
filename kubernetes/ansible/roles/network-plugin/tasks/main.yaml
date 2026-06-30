@@ -19,16 +19,20 @@
 - name: Apply Calico Installation
   ansible.builtin.shell: kubectl apply -f /tmp/calico-installation.yaml
 
-- name: Wait for calico-node rollout
-  ansible.builtin.shell: kubectl rollout status daemonset/calico-node -n calico-system
+- name: Wait for calico-node
+  ansible.builtin.shell: |
+    kubectl wait --for=condition=ready pod \
+      -n calico-system -l k8s-app=calico-node --timeout=30s
   register: calico_node
-  retries: 30
+  retries: 12
   delay: 10
   until: calico_node.rc == 0
 
-- name: Wait for calico-kube-controllers rollout
-  ansible.builtin.shell: kubectl rollout status deployment/calico-kube-controllers -n calico-system
+- name: Wait for calico-kube-controllers
+  ansible.builtin.shell: |
+    kubectl wait --for=condition=ready pod \
+      -n calico-system -l k8s-app=calico-kube-controllers --timeout=30s
   register: calico_controllers
-  retries: 30
+  retries: 12
   delay: 10
   until: calico_controllers.rc == 0

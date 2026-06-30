@@ -5,8 +5,12 @@ metadata:
 
 spec:
   calicoNetwork:
+    bgp: Disabled
     ipPools:
       - cidr: {{ pod_network_cidr }}
         encapsulation: {{ calico_encapsulation_mode }}
         natOutgoing: {{ calico_nat_outgoing }}
         nodeSelector: "{{ calico_node_selector }}"
+    nodeAddressAutodetectionV4:
+      canReach: 192.168.56.1
+      firstFound: false
