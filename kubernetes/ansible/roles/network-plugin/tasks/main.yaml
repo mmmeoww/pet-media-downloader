@@ -1,8 +1,7 @@
 - name: add calico helm repo
-  ansible.builtin.shell: helm repo add projectcalico https://docs.tigera.io/calico/charts 2>/dev/null || true
-
-- name: update helm repo
-  ansible.builtin.shell: helm repo update
+  ansible.builtin.shell: |
+    helm repo add projectcalico https://docs.tigera.io/calico/charts 2>/dev/null || \
+    helm repo update projectcalico
 
 - name: install calico helm chart
   ansible.builtin.shell: |

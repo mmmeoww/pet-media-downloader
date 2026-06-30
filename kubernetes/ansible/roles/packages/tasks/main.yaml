@@ -60,6 +60,13 @@
     - kubelet
     - kubeadm
 
+- name: Set kubelet node-ip
+  ansible.builtin.lineinfile:
+    path: /etc/default/kubelet
+    regexp: '^KUBELET_EXTRA_ARGS='
+    line: 'KUBELET_EXTRA_ARGS="--node-ip={{ ansible_host }}"'
+    create: yes
+
 - name: Enable  and start kubelet
   ansible.builtin.systemd_service:
     name: kubelet
