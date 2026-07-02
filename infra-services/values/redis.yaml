@@ -1,10 +1,16 @@
+image:
+  repository: docker.io/library/redis
+  tag: "7-alpine"
+  pullPolicy: IfNotPresent
+
 architecture: standalone
 
 auth:
+  enabled: true
   existingSecret: redis-credentials
   existingSecretPasswordKey: password
 
-master:
+standalone:
   persistence:
     enabled: true
     size: 1Gi
@@ -18,6 +24,4 @@ master:
       memory: 512Mi
 
 metrics:
-  enabled: true
-  serviceMonitor:
-    enabled: true
+  enabled: false

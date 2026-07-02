@@ -22,9 +22,9 @@ service:
   consolePort: 9001
 
 metrics:
-  enabled: true
+  enabled: false
   serviceMonitor:
-    enabled: true
+    enabled: false
 
 buckets:
   - name: downloads

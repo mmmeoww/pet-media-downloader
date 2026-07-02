@@ -136,3 +136,13 @@ data:
               while true; do
                 sleep 3600
               done
+  setup: |-
+    #!/bin/sh
+    set -e
+    mkdir -p "$VOL_DIR"
+    chown 100:1000 "$VOL_DIR"
+    chmod 2775 "$VOL_DIR"
+  teardown: |-
+    #!/bin/sh
+    set -e
+    rm -rf "$VOL_DIR"

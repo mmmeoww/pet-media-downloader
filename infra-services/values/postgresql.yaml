@@ -1,31 +1,29 @@
-global:
-  postgresql:
-    auth:
-      username: media_downloader
-      database: media_downloader
-      existingSecret: postgresql-credentials
-      secretKeys:
-        userPasswordKey: password
-        adminPasswordKey: password
-    service:
-      name: postgresql-primary
+image:
+  repository: docker.io/library/postgres
+  tag: "16"
+  pullPolicy: IfNotPresent
 
 architecture: standalone
 
-primary:
-  persistence:
-    enabled: true
-    size: 10Gi
-    storageClass: local-path
-  resources:
-    requests:
-      cpu: 200m
-      memory: 512Mi
-    limits:
-      cpu: 1000m
-      memory: 1Gi
+auth:
+  username: media_downloader
+  database: media_downloader
+  existingSecret: postgresql-credentials
+  existingSecretPostgresPasswordKey: postgres-password
+  existingSecretUserPasswordKey: user-password
+
+persistence:
+  enabled: true
+  size: 10Gi
+  storageClass: local-path
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
 
 metrics:
-  enabled: true
-  serviceMonitor:
-    enabled: true
+  enabled: false

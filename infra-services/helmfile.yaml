@@ -3,8 +3,10 @@ repositories:
     url: https://helm.releases.hashicorp.com
   - name: external-secrets
     url: https://charts.external-secrets.io
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami
+  - name: helmforge
+    url: https://repo.helmforge.dev
+  - name: minio
+    url: https://charts.min.io
 
 releases:
   - name: vault
@@ -27,27 +29,35 @@ releases:
     labels:
       stage: vault
 
-  - name: postgresql
-    namespace: media-downloader
+  - name: eso-resources
+    namespace: infra
     createNamespace: true
-    chart: bitnami/postgresql
-    version: 15.5.30
+    chart: ./charts/eso-resources
+    labels:
+      stage: external-secrets
+
+  - name: postgresql
+    namespace: infra
+    createNamespace: true
+    chart: helmforge/postgresql
+    version: 2.0.4
     values:
       - values/postgresql.yaml
     labels:
       stage: infrastructure
 
   - name: rabbitmq
-    namespace: media-downloader
-    chart: bitnami/rabbitmq
-    version: 14.6.6
+    namespace: infra
+    createNamespace: true
+    chart: helmforge/rabbitmq
+    version: 1.6.1
     values:
       - values/rabbitmq.yaml
     labels:
       stage: infrastructure
 
   - name: minio
-    namespace: media-downloader
+    namespace: infra
     chart: minio/minio
     version: 5.2.0
     values:
@@ -56,9 +66,10 @@ releases:
       stage: infrastructure
 
   - name: redis
-    namespace: media-downloader
-    chart: bitnami/redis
-    version: 19.6.4
+    namespace: infra
+    createNamespace: true
+    chart: helmforge/redis
+    version: 1.6.19
     values:
       - values/redis.yaml
     labels:

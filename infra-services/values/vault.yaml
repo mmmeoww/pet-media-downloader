@@ -17,6 +17,7 @@ server:
   agentInjector:
     enabled: false
 
+
 injector:
   enabled: false
 

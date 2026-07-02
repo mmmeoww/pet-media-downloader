@@ -1,15 +1,29 @@
+image:
+  repository: docker.io/library/rabbitmq
+  tag: "4.3.2-alpine"
+  pullPolicy: IfNotPresent
+
+architecture: single-node
+
 auth:
   username: media_downloader
-  existingPasswordSecret: rabbitmq-credentials
-  secretKeys:
-    passwordKey: password
+  vhost: /
+  existingSecret: rabbitmq-credentials
+  existingSecretPasswordKey: rabbitmq-password
+  existingSecretErlangCookieKey: rabbitmq-erlang-cookie
 
-persistence:
+queueDefaults:
+  type: quorum
+
+management:
   enabled: true
-  size: 5Gi
-  storageClass: local-path
 
-replicaCount: 1
+singleNode:
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: local-path
+    accessMode: ReadWriteOnce
 
 resources:
   requests:
@@ -19,21 +33,9 @@ resources:
     cpu: 1000m
     memory: 1Gi
 
-extraPlugins: "rabbitmq_management"
-
-service:
-  type: ClusterIP
-  ports:
-    amqp: 5672
-    manager: 15672
-
-metrics:
-  enabled: true
-  serviceMonitor:
-    enabled: true
-
-extraConfiguration: |-
-  load_definitions = /app/definitions.json
+config:
+  extra: |
+    load_definitions = /app/definitions.json
 
 extraVolumes:
   - name: definitions
@@ -44,3 +46,6 @@ extraVolumeMounts:
   - name: definitions
     mountPath: /app/definitions.json
     subPath: definitions.json
+
+metrics:
+  enabled: false
