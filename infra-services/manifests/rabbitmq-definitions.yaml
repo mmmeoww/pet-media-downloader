@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-definitions
+  namespace: media-downloader
+data:
+  definitions.json: |
+    {
+      "queues": [
+        {"name": "downloads", "durable": true, "arguments": {}},
+        {"name": "conversions", "durable": true, "arguments": {}},
+        {"name": "notifications", "durable": true, "arguments": {}}
+      ],
+      "exchanges": [
+        {"name": "media.direct", "type": "direct", "durable": true},
+        {"name": "media.dlx", "type": "direct", "durable": true}
+      ],
+      "bindings": [
+        {"source": "media.direct", "vhost": "/", "destination": "downloads", "destination_type": "queue", "routing_key": "download"},
+        {"source": "media.direct", "vhost": "/", "destination": "conversions", "destination_type": "queue", "routing_key": "convert"},
+        {"source": "media.direct", "vhost": "/", "destination": "notifications", "destination_type": "queue", "routing_key": "notify"}
+      ]
+    }

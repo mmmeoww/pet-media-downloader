@@ -1,0 +1,46 @@
+auth:
+  username: media_downloader
+  existingPasswordSecret: rabbitmq-credentials
+  secretKeys:
+    passwordKey: password
+
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClass: local-path
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+extraPlugins: "rabbitmq_management"
+
+service:
+  type: ClusterIP
+  ports:
+    amqp: 5672
+    manager: 15672
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+extraConfiguration: |-
+  load_definitions = /app/definitions.json
+
+extraVolumes:
+  - name: definitions
+    configMap:
+      name: rabbitmq-definitions
+
+extraVolumeMounts:
+  - name: definitions
+    mountPath: /app/definitions.json
+    subPath: definitions.json

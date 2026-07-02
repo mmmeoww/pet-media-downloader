@@ -1,0 +1,23 @@
+architecture: standalone
+
+auth:
+  existingSecret: redis-credentials
+  existingSecretPasswordKey: password
+
+master:
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: local-path
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true

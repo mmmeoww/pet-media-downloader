@@ -24,6 +24,12 @@
   roles:
     - network-plugin
 
+- name: Install storage provisioner
+  hosts: control-plane
+  become: yes
+  roles:
+    - storage-provisioner
+
 - name: Fetch local kubeconfig
   hosts: control-plane
   become: yes

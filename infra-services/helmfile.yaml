@@ -1,0 +1,65 @@
+repositories:
+  - name: hashicorp
+    url: https://helm.releases.hashicorp.com
+  - name: external-secrets
+    url: https://charts.external-secrets.io
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: vault
+    namespace: vault
+    createNamespace: true
+    chart: hashicorp/vault
+    version: 0.28.1
+    values:
+      - values/vault.yaml
+    labels:
+      stage: vault
+
+  - name: external-secrets
+    namespace: external-secrets
+    createNamespace: true
+    chart: external-secrets/external-secrets
+    version: 0.10.0
+    values:
+      - values/external-secrets.yaml
+    labels:
+      stage: vault
+
+  - name: postgresql
+    namespace: media-downloader
+    createNamespace: true
+    chart: bitnami/postgresql
+    version: 15.5.30
+    values:
+      - values/postgresql.yaml
+    labels:
+      stage: infrastructure
+
+  - name: rabbitmq
+    namespace: media-downloader
+    chart: bitnami/rabbitmq
+    version: 14.6.6
+    values:
+      - values/rabbitmq.yaml
+    labels:
+      stage: infrastructure
+
+  - name: minio
+    namespace: media-downloader
+    chart: minio/minio
+    version: 5.2.0
+    values:
+      - values/minio.yaml
+    labels:
+      stage: infrastructure
+
+  - name: redis
+    namespace: media-downloader
+    chart: bitnami/redis
+    version: 19.6.4
+    values:
+      - values/redis.yaml
+    labels:
+      stage: infrastructure
