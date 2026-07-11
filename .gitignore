@@ -1,2 +1,2 @@
-*/.vagrant
-*/vault-init.json
+secrets/values.yaml
+*/vault-credentials/*.json

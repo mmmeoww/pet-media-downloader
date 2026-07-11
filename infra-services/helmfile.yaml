@@ -33,8 +33,10 @@ releases:
     namespace: infra
     createNamespace: true
     chart: ./charts/eso-resources
+    needs:
+      - external-secrets/external-secrets
     labels:
-      stage: external-secrets
+      stage: secrets
 
   - name: postgresql
     namespace: infra
@@ -43,6 +45,10 @@ releases:
     version: 2.0.4
     values:
       - values/postgresql.yaml
+    strategicMergePatches:
+      - patches/postgresql-volume-permissions.yaml
+    needs:
+      - infra/eso-resources
     labels:
       stage: infrastructure
 
@@ -53,6 +59,8 @@ releases:
     version: 1.6.1
     values:
       - values/rabbitmq.yaml
+    needs:
+      - infra/eso-resources
     labels:
       stage: infrastructure
 
@@ -62,6 +70,8 @@ releases:
     version: 5.2.0
     values:
       - values/minio.yaml
+    needs:
+      - infra/eso-resources
     labels:
       stage: infrastructure
 
@@ -72,5 +82,7 @@ releases:
     version: 1.6.19
     values:
       - values/redis.yaml
+    needs:
+      - infra/eso-resources
     labels:
       stage: infrastructure

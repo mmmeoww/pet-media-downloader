@@ -6,16 +6,16 @@ image:
 architecture: standalone
 
 auth:
-  username: media_downloader
-  database: media_downloader
+  username: postgres
+  database: application
   existingSecret: postgresql-credentials
-  existingSecretPostgresPasswordKey: password
-  existingSecretUserPasswordKey: password
+  existingSecretPostgresPasswordKey: POSTGRES_PASSWORD
+  existingSecretUserPasswordKey: POSTGRES_PASSWORD
 
-persistence:
-  enabled: true
-  size: 10Gi
-  storageClass: local-path
+standalone:
+  persistence:
+    enabled: true
+    size: 8Gi
 
 resources:
   requests:
@@ -27,3 +27,19 @@ resources:
 
 metrics:
   enabled: false
+
+podSecurityContext:
+  fsGroup: 999
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  runAsUser: 999
+  runAsGroup: 999
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL

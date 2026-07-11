@@ -8,7 +8,7 @@ architecture: standalone
 auth:
   enabled: true
   existingSecret: redis-credentials
-  existingSecretPasswordKey: password
+  existingSecretPasswordKey: REDIS_PASSWORD
 
 standalone:
   persistence:
@@ -25,3 +25,20 @@ standalone:
 
 metrics:
   enabled: false
+
+podSecurityContext:
+  fsGroup: 0
+
+securityContext:
+  runAsUser: 0
+  runAsGroup: 0
+  runAsNonRoot: false
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+    drop:
+      - ALL

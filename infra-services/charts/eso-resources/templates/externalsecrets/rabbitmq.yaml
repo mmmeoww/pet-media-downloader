@@ -1,0 +1,25 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: rabbitmq-credentials
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: rabbitmq-credentials
+    creationPolicy: Owner
+  data:
+    - secretKey: RABBITMQ_USER
+      remoteRef:
+        key: rabbitmq
+        property: RABBITMQ_USER
+    - secretKey: RABBITMQ_PASSWORD
+      remoteRef:
+        key: rabbitmq
+        property: RABBITMQ_PASSWORD
+    - secretKey: ERLANG_COOKIE
+      remoteRef:
+        key: rabbitmq
+        property: ERLANG_COOKIE
