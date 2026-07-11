@@ -1,2 +1,2 @@
-secrets/values.yaml
 */vault-credentials/*.json
+kubernetes/.vagrant/
