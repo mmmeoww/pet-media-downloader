@@ -1,0 +1,45 @@
+image:
+  repository: docker.io/library/postgres
+  tag: "16"
+  pullPolicy: IfNotPresent
+
+architecture: standalone
+
+auth:
+  username: postgres
+  database: application
+  existingSecret: postgresql-credentials
+  existingSecretPostgresPasswordKey: POSTGRES_PASSWORD
+  existingSecretUserPasswordKey: POSTGRES_PASSWORD
+
+standalone:
+  persistence:
+    enabled: true
+    size: 8Gi
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+metrics:
+  enabled: false
+
+podSecurityContext:
+  fsGroup: 999
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  runAsUser: 999
+  runAsGroup: 999
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL

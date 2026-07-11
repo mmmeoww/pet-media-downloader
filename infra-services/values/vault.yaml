@@ -1,0 +1,26 @@
+global:
+  enabled: true
+
+server:
+  dev:
+    enabled: false
+  standalone:
+    enabled: true
+  dataStorage:
+    enabled: true
+    size: 10Gi
+    storageClass: local-path
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 8200
+  agentInjector:
+    enabled: false
+
+
+injector:
+  enabled: false
+
+ui:
+  enabled: true
+  serviceType: ClusterIP
