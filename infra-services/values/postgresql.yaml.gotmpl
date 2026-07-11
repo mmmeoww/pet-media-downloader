@@ -1,0 +1,45 @@
+image:
+  repository: {{ .Values.images.postgresql.repository | quote }}
+  tag: {{ .Values.images.postgresql.tag | quote }}
+  pullPolicy: {{ .Values.images.postgresql.pullPolicy | quote }}
+
+architecture: standalone
+
+auth:
+  username: postgres
+  database: application
+  existingSecret: postgresql-credentials
+  existingSecretPostgresPasswordKey: POSTGRES_PASSWORD
+  existingSecretUserPasswordKey: POSTGRES_PASSWORD
+
+standalone:
+  persistence:
+    enabled: true
+    size: {{ .Values.persistence.postgresqlSize | quote }}
+    storageClass: {{ .Values.persistence.storageClass | quote }}
+  resources:
+    requests:
+      cpu: {{ .Values.resources.postgresql.requests.cpu | quote }}
+      memory: {{ .Values.resources.postgresql.requests.memory | quote }}
+    limits:
+      cpu: {{ .Values.resources.postgresql.limits.cpu | quote }}
+      memory: {{ .Values.resources.postgresql.limits.memory | quote }}
+
+metrics:
+  enabled: false
+
+podSecurityContext:
+  fsGroup: 999
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  runAsUser: 999
+  runAsGroup: 999
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL

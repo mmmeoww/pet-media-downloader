@@ -1,0 +1,44 @@
+image:
+  repository: {{ .Values.images.redis.repository | quote }}
+  tag: {{ .Values.images.redis.tag | quote }}
+  pullPolicy: {{ .Values.images.redis.pullPolicy | quote }}
+
+architecture: standalone
+
+auth:
+  enabled: true
+  existingSecret: redis-credentials
+  existingSecretPasswordKey: REDIS_PASSWORD
+
+standalone:
+  persistence:
+    enabled: true
+    size: {{ .Values.persistence.redisSize | quote }}
+    storageClass: {{ .Values.persistence.storageClass | quote }}
+  resources:
+    requests:
+      cpu: {{ .Values.resources.redis.requests.cpu | quote }}
+      memory: {{ .Values.resources.redis.requests.memory | quote }}
+    limits:
+      cpu: {{ .Values.resources.redis.limits.cpu | quote }}
+      memory: {{ .Values.resources.redis.limits.memory | quote }}
+
+metrics:
+  enabled: false
+
+podSecurityContext:
+  fsGroup: 0
+
+securityContext:
+  runAsUser: 0
+  runAsGroup: 0
+  runAsNonRoot: false
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+    drop:
+      - ALL

@@ -1,7 +1,7 @@
 image:
-  repository: docker.io/library/rabbitmq
-  tag: "4.3.2-alpine"
-  pullPolicy: IfNotPresent
+  repository: {{ .Values.images.rabbitmq.repository | quote }}
+  tag: {{ .Values.images.rabbitmq.tag | quote }}
+  pullPolicy: {{ .Values.images.rabbitmq.pullPolicy | quote }}
 
 architecture: single-node
 
@@ -22,17 +22,17 @@ management:
 singleNode:
   persistence:
     enabled: true
-    size: 5Gi
-    storageClass: local-path
+    size: {{ .Values.persistence.rabbitmqSize | quote }}
+    storageClass: {{ .Values.persistence.storageClass | quote }}
     accessMode: ReadWriteOnce
 
 resources:
   requests:
-    cpu: 200m
-    memory: 512Mi
+    cpu: {{ .Values.resources.rabbitmq.requests.cpu | quote }}
+    memory: {{ .Values.resources.rabbitmq.requests.memory | quote }}
   limits:
-    cpu: 1000m
-    memory: 1Gi
+    cpu: {{ .Values.resources.rabbitmq.limits.cpu | quote }}
+    memory: {{ .Values.resources.rabbitmq.limits.memory | quote }}
 
 config:
   extra: |

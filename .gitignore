@@ -1,2 +1,5 @@
 */vault-bootstrap/*.json
 */.vagrant/
+.agents
+.codex
+.vscode

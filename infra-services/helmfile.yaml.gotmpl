@@ -1,3 +1,10 @@
+environments:
+  default:
+    values:
+      - environments/default.yaml
+
+---
+
 repositories:
   - name: hashicorp
     url: https://helm.releases.hashicorp.com
@@ -13,9 +20,9 @@ releases:
     namespace: vault
     createNamespace: true
     chart: hashicorp/vault
-    version: 0.28.1
+    version: {{ .Values.charts.vault | quote }}
     values:
-      - values/vault.yaml
+      - values/vault.yaml.gotmpl
     labels:
       stage: vault
 
@@ -23,9 +30,9 @@ releases:
     namespace: external-secrets
     createNamespace: true
     chart: external-secrets/external-secrets
-    version: 0.10.0
+    version: {{ .Values.charts.externalSecrets | quote }}
     values:
-      - values/external-secrets.yaml
+      - values/external-secrets.yaml.gotmpl
     labels:
       stage: vault
 
@@ -42,11 +49,11 @@ releases:
     namespace: infra
     createNamespace: true
     chart: helmforge/postgresql
-    version: 2.0.4
+    version: {{ .Values.charts.postgresql | quote }}
     values:
-      - values/postgresql.yaml
+      - values/postgresql.yaml.gotmpl
     strategicMergePatches:
-      - patches/postgresql-volume-permissions.yaml
+      - patches/postgresql-volume-permissions.yaml.gotmpl
     needs:
       - infra/eso-resources
     labels:
@@ -56,9 +63,9 @@ releases:
     namespace: infra
     createNamespace: true
     chart: helmforge/rabbitmq
-    version: 1.6.1
+    version: {{ .Values.charts.rabbitmq | quote }}
     values:
-      - values/rabbitmq.yaml
+      - values/rabbitmq.yaml.gotmpl
     needs:
       - infra/eso-resources
     labels:
@@ -67,9 +74,9 @@ releases:
   - name: minio
     namespace: infra
     chart: minio/minio
-    version: 5.2.0
+    version: {{ .Values.charts.minio | quote }}
     values:
-      - values/minio.yaml
+      - values/minio.yaml.gotmpl
     needs:
       - infra/eso-resources
     labels:
@@ -79,9 +86,9 @@ releases:
     namespace: infra
     createNamespace: true
     chart: helmforge/redis
-    version: 1.6.19
+    version: {{ .Values.charts.redis | quote }}
     values:
-      - values/redis.yaml
+      - values/redis.yaml.gotmpl
     needs:
       - infra/eso-resources
     labels:

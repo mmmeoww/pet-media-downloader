@@ -25,13 +25,15 @@ cd infra-services
 
 ## Helmfile Stages
 
-В `infra-services/helmfile.yaml` используются stages:
+В `infra-services/helmfile.yaml.gotmpl` используются stages:
 
 - `stage=vault` - Vault и External Secrets Operator.
 - `stage=secrets` - chart `./charts/eso-resources`: `ClusterSecretStore` и `ExternalSecret` ресурсы.
 - `stage=infrastructure` - PostgreSQL, RabbitMQ, MinIO, Redis.
 
 У infrastructure-релизов есть `needs` на `infra/eso-resources`, но при ручной раскатке все равно применяй stages явно и по порядку.
+
+Единственное Helmfile environment называется `default` и автоматически используется wrapper-скриптом. Версии chart, образы, параметры persistence и resources находятся в `infra-services/environments/default.yaml`. Values и patches, использующие эти параметры, имеют расширение `.gotmpl`.
 
 ## Порядок Развертывания
 
@@ -105,7 +107,7 @@ ExternalSecrets сейчас передают в Kubernetes Secrets только
 - Persistence: `8Gi`.
 - Main container запускается non-root: UID/GID `999`, `allowPrivilegeEscalation: false`, capabilities dropped.
 - Для прав на PVC используется `strategicMergePatches`:
-  `infra-services/patches/postgresql-volume-permissions.yaml`.
+  `infra-services/patches/postgresql-volume-permissions.yaml.gotmpl`.
 
 Не включай `allowPrivilegeEscalation: true` для PostgreSQL main container.
 
@@ -115,7 +117,7 @@ ExternalSecrets сейчас передают в Kubernetes Secrets только
 - Image: `docker.io/library/rabbitmq:4.3.2-alpine`.
 - Namespace: `infra`.
 - Auth берется из Secret `rabbitmq-credentials`.
-- Definitions создаются внутри RabbitMQ release через `values/rabbitmq.yaml`:
+- Definitions создаются внутри RabbitMQ release через `values/rabbitmq.yaml.gotmpl`:
   `extraManifests`, `extraVolumes`, `extraVolumeMounts`, `config.extra`.
 - ConfigMap: `rabbitmq-definitions`.
 - Definitions загружаются из `/app/definitions.json`.
@@ -128,7 +130,7 @@ ExternalSecrets сейчас передают в Kubernetes Secrets только
 - Namespace: `infra`.
 - Standalone mode.
 - Existing Secret: `minio-credentials`.
-- Buckets создаются chart hook job из `values/minio.yaml`.
+- Buckets создаются chart hook job из `values/minio.yaml.gotmpl`.
 - `minio-post-job` со статусом `Completed` - нормальное состояние hook job.
 
 ### Redis

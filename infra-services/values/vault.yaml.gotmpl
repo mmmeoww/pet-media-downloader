@@ -1,0 +1,30 @@
+global:
+  enabled: true
+
+server:
+  image:
+    repository: {{ .Values.images.vault.repository | quote }}
+    tag: {{ .Values.images.vault.tag | quote }}
+    pullPolicy: {{ .Values.images.vault.pullPolicy | quote }}
+  dev:
+    enabled: false
+  standalone:
+    enabled: true
+  dataStorage:
+    enabled: true
+    size: {{ .Values.persistence.vaultSize | quote }}
+    storageClass: {{ .Values.persistence.storageClass | quote }}
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 8200
+  agentInjector:
+    enabled: false
+
+
+injector:
+  enabled: false
+
+ui:
+  enabled: true
+  serviceType: ClusterIP
