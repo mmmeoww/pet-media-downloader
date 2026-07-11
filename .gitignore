@@ -1,2 +1,2 @@
 */vault-credentials/*.json
-kubernetes/.vagrant/
+*/.vagrant/
