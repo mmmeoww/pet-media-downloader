@@ -9,8 +9,8 @@ auth:
   username: media_downloader
   database: media_downloader
   existingSecret: postgresql-credentials
-  existingSecretPostgresPasswordKey: postgres-password
-  existingSecretUserPasswordKey: user-password
+  existingSecretPostgresPasswordKey: password
+  existingSecretUserPasswordKey: password
 
 persistence:
   enabled: true

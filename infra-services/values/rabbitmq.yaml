@@ -9,8 +9,8 @@ auth:
   username: media_downloader
   vhost: /
   existingSecret: rabbitmq-credentials
-  existingSecretPasswordKey: rabbitmq-password
-  existingSecretErlangCookieKey: rabbitmq-erlang-cookie
+  existingSecretPasswordKey: password
+  erlangCookie: ""
 
 queueDefaults:
   type: quorum
