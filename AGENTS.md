@@ -28,10 +28,11 @@ cd infra-services
 В `infra-services/helmfile.yaml.gotmpl` используются stages:
 
 - `stage=vault` - Vault и External Secrets Operator.
-- `stage=secrets` - chart `./charts/eso-resources`: `ClusterSecretStore` и `ExternalSecret` ресурсы.
+- `stage=secrets` - charts `./charts/vault-secret-store` и `./charts/infra-secrets`: общий `ClusterSecretStore` и infrastructure `ExternalSecret` ресурсы.
+- `stage=observability` - charts `./charts/observability-secrets` и `kube-prometheus-stack`.
 - `stage=infrastructure` - PostgreSQL, RabbitMQ, MinIO, Redis.
 
-У infrastructure-релизов есть `needs` на `infra/eso-resources`, но при ручной раскатке все равно применяй stages явно и по порядку.
+У infrastructure-релизов есть `needs` на `infra/infra-secrets`, но при ручной раскатке все равно применяй stages явно и по порядку.
 
 Единственное Helmfile environment называется `default` и автоматически используется wrapper-скриптом. Версии chart, образы, параметры persistence и resources находятся в `infra-services/environments/default.yaml`. Values и patches, использующие эти параметры, имеют расширение `.gotmpl`.
 
@@ -40,11 +41,12 @@ cd infra-services
 ```bash
 cd infra-services
 ./helmfile.sh sync --selector stage=vault
-cd vault-credentials
+cd vault-bootstrap
 ./vault-unseal.sh
 ./vault-put.sh
 cd ..
 ./helmfile.sh sync --selector stage=secrets
+./helmfile.sh sync --selector stage=observability
 ./helmfile.sh sync --selector stage=infrastructure
 ```
 
@@ -62,7 +64,7 @@ cd ..
 - Auth для ESO: Kubernetes Secret `vault-token` в namespace `vault`.
 - Policy для ESO: `external-secrets-read`, read/list только для mount `infrastructure` и `auth/token/lookup-self`.
 
-Скрипты Vault лежат в `infra-services/vault-credentials/`:
+Скрипты Vault лежат в `infra-services/vault-bootstrap/`:
 
 - `vault-unseal.sh` - init/unseal через Vault HTTP API.
 - `vault-put.sh` - включает KV mount, пишет данные из `secrets.json`, создает policy/token и обновляет Kubernetes Secret `vault-token`.

@@ -14,6 +14,8 @@ repositories:
     url: https://repo.helmforge.dev
   - name: minio
     url: https://charts.min.io
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
 
 releases:
   - name: vault
@@ -36,12 +38,20 @@ releases:
     labels:
       stage: vault
 
-  - name: eso-resources
-    namespace: infra
-    createNamespace: true
-    chart: ./charts/eso-resources
+  - name: vault-secret-store
+    namespace: external-secrets
+    chart: ./charts/vault-secret-store
     needs:
       - external-secrets/external-secrets
+    labels:
+      stage: secrets
+
+  - name: infra-secrets
+    namespace: infra
+    createNamespace: true
+    chart: ./charts/infra-secrets
+    needs:
+      - external-secrets/vault-secret-store
     labels:
       stage: secrets
 
@@ -55,7 +65,7 @@ releases:
     strategicMergePatches:
       - patches/postgresql-volume-permissions.yaml.gotmpl
     needs:
-      - infra/eso-resources
+      - infra/infra-secrets
     labels:
       stage: infrastructure
 
@@ -67,7 +77,7 @@ releases:
     values:
       - values/rabbitmq.yaml.gotmpl
     needs:
-      - infra/eso-resources
+      - infra/infra-secrets
     labels:
       stage: infrastructure
 
@@ -77,8 +87,10 @@ releases:
     version: {{ .Values.charts.minio | quote }}
     values:
       - values/minio.yaml.gotmpl
+    strategicMergePatches:
+      - patches/minio-volume-permissions.yaml.gotmpl
     needs:
-      - infra/eso-resources
+      - infra/infra-secrets
     labels:
       stage: infrastructure
 
@@ -90,6 +102,27 @@ releases:
     values:
       - values/redis.yaml.gotmpl
     needs:
-      - infra/eso-resources
+      - infra/infra-secrets
     labels:
       stage: infrastructure
+
+  - name: observability-secrets
+    namespace: observability
+    createNamespace: true
+    chart: ./charts/observability-secrets
+    needs:
+      - external-secrets/vault-secret-store
+    labels:
+      stage: observability
+
+  - name: kube-prometheus-stack
+    namespace: observability
+    createNamespace: true
+    chart: prometheus-community/kube-prometheus-stack
+    version: {{ .Values.charts.kubePrometheusStack | quote }}
+    values:
+      - values/observability/kube-prometheus-stack.yaml.gotmpl
+    needs:
+      - observability/observability-secrets
+    labels:
+      stage: observability

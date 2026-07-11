@@ -5,6 +5,7 @@ charts:
   rabbitmq: "1.6.1"
   minio: "5.2.0"
   redis: "1.6.19"
+  kubePrometheusStack: "87.15.1"
 
 images:
   vault:
@@ -47,6 +48,8 @@ persistence:
   rabbitmqSize: 5Gi
   minioSize: 15Gi
   redisSize: 1Gi
+  grafanaSize: 5Gi
+  prometheusSize: 10Gi
 
 resources:
   externalSecrets:
@@ -84,3 +87,17 @@ resources:
     limits:
       cpu: 500m
       memory: 512Mi
+  grafana:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  prometheus:
+    requests:
+      cpu: 300m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi

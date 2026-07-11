@@ -9,6 +9,10 @@
       --namespace local-path-storage \
       --create-namespace
 
+- name: Restart local-path-provisioner after configuration update
+  ansible.builtin.command:
+    cmd: kubectl rollout restart deployment/local-path-provisioner -n local-path-storage
+
 - name: Wait for local-path-provisioner pod
   ansible.builtin.shell: |
     kubectl wait --for=condition=ready pod \
