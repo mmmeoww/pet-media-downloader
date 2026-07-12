@@ -114,15 +114,3 @@ releases:
       - external-secrets/vault-secret-store
     labels:
       stage: observability
-
-  - name: kube-prometheus-stack
-    namespace: observability
-    createNamespace: true
-    chart: prometheus-community/kube-prometheus-stack
-    version: {{ .Values.charts.kubePrometheusStack | quote }}
-    values:
-      - values/observability/kube-prometheus-stack.yaml.gotmpl
-    needs:
-      - observability/observability-secrets
-    labels:
-      stage: observability
