@@ -24,7 +24,10 @@ standalone:
       memory: {{ .Values.resources.redis.limits.memory | quote }}
 
 metrics:
-  enabled: false
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
 
 podSecurityContext:
   fsGroup: 0

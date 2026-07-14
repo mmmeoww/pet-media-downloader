@@ -26,7 +26,10 @@ standalone:
       memory: {{ .Values.resources.postgresql.limits.memory | quote }}
 
 metrics:
-  enabled: false
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
 
 podSecurityContext:
   fsGroup: 999

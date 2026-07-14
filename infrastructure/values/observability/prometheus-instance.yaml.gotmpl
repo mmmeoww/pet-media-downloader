@@ -1,0 +1,21 @@
+image:
+  repository: {{ .Values.images.prometheus.repository | quote }}
+  tag: {{ .Values.images.prometheus.tag | quote }}
+
+resources:
+  requests:
+    cpu: {{ .Values.resources.prometheus.requests.cpu | quote }}
+    memory: {{ .Values.resources.prometheus.requests.memory | quote }}
+  limits:
+    cpu: {{ .Values.resources.prometheus.limits.cpu | quote }}
+    memory: {{ .Values.resources.prometheus.limits.memory | quote }}
+
+storage:
+  storageClassName: {{ .Values.persistence.storageClass | quote }}
+  size: {{ .Values.persistence.prometheusSize | quote }}
+
+volumePermissions:
+  image:
+    repository: {{ .Values.images.prometheusVolumePermissions.repository | quote }}
+    tag: {{ .Values.images.prometheusVolumePermissions.tag | quote }}
+    pullPolicy: {{ .Values.images.prometheusVolumePermissions.pullPolicy | quote }}

@@ -1,0 +1,16 @@
+image:
+  repository: {{ .Values.images.prometheusOperator.repository | quote }}
+  tag: {{ .Values.images.prometheusOperator.tag | quote }}
+  pullPolicy: {{ .Values.images.prometheusOperator.pullPolicy | quote }}
+
+prometheusConfigReloader:
+  repository: {{ .Values.images.prometheusConfigReloader.repository | quote }}
+  tag: {{ .Values.images.prometheusConfigReloader.tag | quote }}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

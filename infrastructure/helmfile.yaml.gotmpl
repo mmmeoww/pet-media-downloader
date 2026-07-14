@@ -2,9 +2,7 @@ environments:
   default:
     values:
       - environments/default.yaml
-
 ---
-
 repositories:
   - name: hashicorp
     url: https://helm.releases.hashicorp.com
@@ -16,6 +14,8 @@ repositories:
     url: https://charts.min.io
   - name: prometheus-community
     url: https://prometheus-community.github.io/helm-charts
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
 
 releases:
   - name: vault
@@ -24,7 +24,7 @@ releases:
     chart: hashicorp/vault
     version: {{ .Values.charts.vault | quote }}
     values:
-      - values/vault.yaml.gotmpl
+      - values/secrets/vault.yaml.gotmpl
     labels:
       stage: vault
 
@@ -34,7 +34,7 @@ releases:
     chart: external-secrets/external-secrets
     version: {{ .Values.charts.externalSecrets | quote }}
     values:
-      - values/external-secrets.yaml.gotmpl
+      - values/secrets/external-secrets.yaml.gotmpl
     labels:
       stage: vault
 
@@ -55,13 +55,86 @@ releases:
     labels:
       stage: secrets
 
+  - name: observability-secrets
+    namespace: observability
+    createNamespace: true
+    chart: ./charts/observability-secrets
+    needs:
+      - external-secrets/vault-secret-store
+    labels:
+      stage: observability
+
+  - name: prometheus-operator-crds
+    namespace: observability
+    createNamespace: true
+    chart: prometheus-community/prometheus-operator-crds
+    version: {{ .Values.charts.prometheusOperatorCrds | quote }}
+    labels:
+      stage: observability
+
+  - name: prometheus-operator
+    namespace: observability
+    chart: ./charts/prometheus-operator
+    values:
+      - values/observability/prometheus-operator.yaml.gotmpl
+    needs:
+      - observability/prometheus-operator-crds
+    labels:
+      stage: observability
+
+  - name: prometheus-instance
+    namespace: observability
+    chart: ./charts/prometheus-instance
+    values:
+      - values/observability/prometheus-instance.yaml.gotmpl
+    needs:
+      - observability/prometheus-operator
+    labels:
+      stage: observability
+
+  - name: kube-state-metrics
+    namespace: observability
+    chart: prometheus-community/kube-state-metrics
+    version: {{ .Values.charts.kubeStateMetrics | quote }}
+    values:
+      - values/observability/kube-state-metrics.yaml.gotmpl
+    needs:
+      - observability/prometheus-instance
+    labels:
+      stage: observability
+
+  - name: prometheus-node-exporter
+    namespace: observability
+    chart: prometheus-community/prometheus-node-exporter
+    version: {{ .Values.charts.prometheusNodeExporter | quote }}
+    values:
+      - values/observability/node-exporter.yaml.gotmpl
+    needs:
+      - observability/prometheus-instance
+    labels:
+      stage: observability
+
+  - name: grafana
+    namespace: observability
+    chart: grafana/grafana
+    version: {{ .Values.charts.grafana | quote }}
+    values:
+      - values/observability/grafana.yaml.gotmpl
+    strategicMergePatches:
+      - patches/grafana-volume-permissions.yaml.gotmpl
+    needs:
+      - observability/observability-secrets
+      - observability/prometheus-instance
+    labels:
+      stage: observability
+
   - name: postgresql
     namespace: infra
     createNamespace: true
     chart: helmforge/postgresql
     version: {{ .Values.charts.postgresql | quote }}
     values:
-      - values/postgresql.yaml.gotmpl
+      - values/data-services/postgresql.yaml.gotmpl
     strategicMergePatches:
       - patches/postgresql-volume-permissions.yaml.gotmpl
     needs:
@@ -75,7 +148,7 @@ releases:
     chart: helmforge/rabbitmq
     version: {{ .Values.charts.rabbitmq | quote }}
     values:
-      - values/rabbitmq.yaml.gotmpl
+      - values/data-services/rabbitmq.yaml.gotmpl
     needs:
       - infra/infra-secrets
     labels:
@@ -86,7 +159,7 @@ releases:
     chart: minio/minio
     version: {{ .Values.charts.minio | quote }}
     values:
-      - values/minio.yaml.gotmpl
+      - values/data-services/minio.yaml.gotmpl
     strategicMergePatches:
       - patches/minio-volume-permissions.yaml.gotmpl
     needs:
@@ -100,17 +173,8 @@ releases:
     chart: helmforge/redis
     version: {{ .Values.charts.redis | quote }}
     values:
-      - values/redis.yaml.gotmpl
+      - values/data-services/redis.yaml.gotmpl
     needs:
       - infra/infra-secrets
     labels:
       stage: infrastructure
-
-  - name: observability-secrets
-    namespace: observability
-    createNamespace: true
-    chart: ./charts/observability-secrets
-    needs:
-      - external-secrets/vault-secret-store
-    labels:
-      stage: observability

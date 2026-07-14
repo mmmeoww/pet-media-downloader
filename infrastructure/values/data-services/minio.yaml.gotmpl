@@ -32,9 +32,11 @@ service:
   consolePort: 9001
 
 metrics:
-  enabled: false
   serviceMonitor:
-    enabled: false
+    enabled: true
+    includeNode: true
+    public: true
+    interval: 30s
 
 buckets:
   - name: downloads

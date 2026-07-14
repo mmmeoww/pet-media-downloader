@@ -1,0 +1,62 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicas }}
+  serviceAccountName: {{ .Values.serviceAccount.name }}
+  image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+  retention: {{ .Values.retention | quote }}
+  retentionSize: {{ .Values.retentionSize | quote }}
+{{- if .Values.volumePermissions.enabled }}
+  initContainers:
+    - name: volume-permissions
+      image: "{{ .Values.volumePermissions.image.repository }}:{{ .Values.volumePermissions.image.tag }}"
+      imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy }}
+      command:
+        - sh
+        - -ec
+        - chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsGroup }} /prometheus
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
+        allowPrivilegeEscalation: false
+        capabilities:
+          add:
+            - CHOWN
+            - FOWNER
+          drop:
+            - ALL
+      volumeMounts:
+        - name: prometheus-prometheus-db
+          mountPath: /prometheus
+{{- end }}
+  securityContext:
+{{ toYaml .Values.securityContext | indent 4 }}
+  resources:
+{{ toYaml .Values.resources | indent 4 }}
+  serviceMonitorSelector:
+{{ toYaml .Values.serviceMonitorSelector | indent 4 }}
+  serviceMonitorNamespaceSelector:
+{{ toYaml .Values.serviceMonitorNamespaceSelector | indent 4 }}
+  podMonitorSelector:
+{{ toYaml .Values.podMonitorSelector | indent 4 }}
+  podMonitorNamespaceSelector:
+{{ toYaml .Values.podMonitorNamespaceSelector | indent 4 }}
+  ruleSelector:
+{{ toYaml .Values.ruleSelector | indent 4 }}
+  ruleNamespaceSelector:
+{{ toYaml .Values.ruleNamespaceSelector | indent 4 }}
+  storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: {{ .Values.storage.storageClassName | quote }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.storage.size | quote }}

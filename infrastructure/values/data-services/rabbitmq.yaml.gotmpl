@@ -49,7 +49,10 @@ extraVolumeMounts:
     subPath: definitions.json
 
 metrics:
-  enabled: false
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
 
 extraManifests:
   - apiVersion: v1

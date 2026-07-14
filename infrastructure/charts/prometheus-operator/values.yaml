@@ -1,0 +1,39 @@
+replicaCount: 1
+
+image:
+  repository: quay.io/prometheus-operator/prometheus-operator
+  tag: v0.92.1
+  pullPolicy: IfNotPresent
+
+prometheusConfigReloader:
+  repository: quay.io/prometheus-operator/prometheus-config-reloader
+  tag: v0.92.1
+
+serviceAccount:
+  name: prometheus-operator
+
+service:
+  type: ClusterIP
+  port: 8080
+
+serviceMonitor:
+  enabled: true
+  labels: {}
+
+resources: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  fsGroup: 65534
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: prometheus-operator
+description: Local Prometheus Operator controller chart
+type: application
+version: 0.1.0
+appVersion: "v0.92.1"

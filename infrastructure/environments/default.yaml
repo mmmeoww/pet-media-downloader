@@ -5,7 +5,36 @@ charts:
   rabbitmq: "1.6.1"
   minio: "5.2.0"
   redis: "1.6.19"
-  kubePrometheusStack: "87.15.1"
+  prometheusOperatorCrds: "30.0.1"
+  kubeStateMetrics: "7.8.1"
+  prometheusNodeExporter: "4.56.0"
+  grafana: "10.5.15"
+
+dashboards:
+  - key: kube-state-metrics-v2
+    gnetId: 13332
+    revision: 12
+    datasource: Prometheus
+  - key: node-exporter-full
+    gnetId: 1860
+    revision: 45
+    datasource: Prometheus
+  - key: postgresql-exporter
+    gnetId: 12485
+    revision: 1
+    datasource: Prometheus
+  - key: rabbitmq-overview
+    gnetId: 10991
+    revision: 1
+    datasource: Prometheus
+  - key: redis-overview
+    gnetId: 763
+    revision: 1
+    datasource: Prometheus
+  - key: minio-overview
+    gnetId: 10946
+    revision: 1
+    datasource: Prometheus
 
 images:
   vault:
@@ -39,6 +68,22 @@ images:
   minioClient:
     repository: quay.io/minio/mc
     tag: "RELEASE.2024-04-18T16-45-29Z"
+    pullPolicy: IfNotPresent
+  prometheusOperator:
+    repository: quay.io/prometheus-operator/prometheus-operator
+    tag: "v0.92.1"
+    pullPolicy: IfNotPresent
+  prometheusConfigReloader:
+    repository: quay.io/prometheus-operator/prometheus-config-reloader
+    tag: "v0.92.1"
+    pullPolicy: IfNotPresent
+  prometheus:
+    repository: quay.io/prometheus/prometheus
+    tag: "v3.13.1"
+    pullPolicy: IfNotPresent
+  prometheusVolumePermissions:
+    repository: docker.io/library/busybox
+    tag: "1.36"
     pullPolicy: IfNotPresent
 
 persistence:

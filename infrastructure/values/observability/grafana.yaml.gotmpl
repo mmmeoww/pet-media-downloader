@@ -1,0 +1,55 @@
+admin:
+  existingSecret: grafana-admin-credentials
+  userKey: admin-user
+  passwordKey: admin-password
+
+persistence:
+  enabled: true
+  type: sts
+  storageClassName: {{ .Values.persistence.storageClass | quote }}
+  accessModes:
+    - ReadWriteOnce
+  size: {{ .Values.persistence.grafanaSize | quote }}
+
+service:
+  type: ClusterIP
+
+resources:
+  requests:
+    cpu: {{ .Values.resources.grafana.requests.cpu | quote }}
+    memory: {{ .Values.resources.grafana.requests.memory | quote }}
+  limits:
+    cpu: {{ .Values.resources.grafana.limits.cpu | quote }}
+    memory: {{ .Values.resources.grafana.limits.memory | quote }}
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus.observability.svc.cluster.local:9090
+        isDefault: true
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: default
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+dashboards:
+  default:
+{{- range .Values.dashboards }}
+    {{ .key }}:
+      gnetId: {{ .gnetId }}
+      revision: {{ .revision }}
+      datasource: {{ .datasource | quote }}
+{{- end }}

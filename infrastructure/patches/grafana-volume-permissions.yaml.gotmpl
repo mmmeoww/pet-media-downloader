@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grafana
+  namespace: observability
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: init-chown-data
+          command:
+            - chown
+            - 472:472
+            - /var/lib/grafana
