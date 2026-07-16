@@ -1,20 +1,44 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/jammy64"
+  # ARM64 Ubuntu cloud image compatible with the vagrant-qemu provider.
+  config.vm.box = "perk/ubuntu-2204-arm64"
   config.vm.box_check_update = false
-  config.vm.provider "virtualbox" do |vb|
-    vb.gui = false
-    vb.memory = 3072
-    vb.cpus = 2
-  end
+
+  # QEMU does not provide VirtualBox shared folders. The Kubernetes nodes do
+  # not need the repository mounted, and disabling it also avoids SMB setup.
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  # The qemu provider uses a user-mode NIC for SSH and a second NIC for the
+  # cluster network. On macOS, a socket pair keeps the two nodes connected
+  # without running Vagrant as root. Start this multi-machine environment with
+  # `vagrant up --no-parallel`: the listener must be ready before worker01
+  # connects to it.
+  CLUSTER_SOCKET_PORT = 12399
 
   config.vm.define "control_plane" do |control_plane|
     control_plane.vm.hostname = "control-plane"
     control_plane.vm.network "private_network", ip: "192.168.56.11"
+    control_plane.vm.provider "qemu" do |qe|
+      qe.memory = "3G"
+      qe.smp = 2
+      qe.advanced_network = true
+      qe.net_mode = :socket
+      qe.socket_opts = "listen=127.0.0.1:#{CLUSTER_SOCKET_PORT}"
+      # Ansible connects from macOS through QEMU's user-mode SSH forward.
+      qe.ssh_port = 50022
+    end
   end
 
   config.vm.define "worker01" do |worker|
     worker.vm.hostname = "worker01"
     worker.vm.network "private_network", ip: "192.168.56.12"
+    worker.vm.provider "qemu" do |qe|
+      qe.memory = "3G"
+      qe.smp = 2
+      qe.advanced_network = true
+      qe.net_mode = :socket
+      qe.socket_opts = "connect=127.0.0.1:#{CLUSTER_SOCKET_PORT}"
+      qe.ssh_port = 50023
+    end
   end
 
   # config.vm.define "worker02" do |worker|
