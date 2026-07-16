@@ -1,0 +1,82 @@
+image:
+  repository: {{ .Values.images.rabbitmq.repository | quote }}
+  tag: {{ .Values.images.rabbitmq.tag | quote }}
+  pullPolicy: {{ .Values.images.rabbitmq.pullPolicy | quote }}
+
+architecture: single-node
+
+auth:
+  username: rabbitmq_user
+  vhost: /
+  existingSecret: rabbitmq-credentials
+  existingSecretUsernameKey: RABBITMQ_USER
+  existingSecretPasswordKey: RABBITMQ_PASSWORD
+  existingSecretErlangCookieKey: ERLANG_COOKIE
+
+queueDefaults:
+  type: quorum
+
+management:
+  enabled: true
+
+singleNode:
+  persistence:
+    enabled: true
+    size: {{ .Values.persistence.rabbitmqSize | quote }}
+    storageClass: {{ .Values.persistence.storageClass | quote }}
+    accessMode: ReadWriteOnce
+
+resources:
+  requests:
+    cpu: {{ .Values.resources.rabbitmq.requests.cpu | quote }}
+    memory: {{ .Values.resources.rabbitmq.requests.memory | quote }}
+  limits:
+    cpu: {{ .Values.resources.rabbitmq.limits.cpu | quote }}
+    memory: {{ .Values.resources.rabbitmq.limits.memory | quote }}
+
+config:
+  extra: |
+    load_definitions = /app/definitions.json
+
+extraVolumes:
+  - name: definitions
+    configMap:
+      name: rabbitmq-definitions
+
+extraVolumeMounts:
+  - name: definitions
+    mountPath: /app/definitions.json
+    subPath: definitions.json
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+
+extraManifests:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: rabbitmq-definitions
+    data:
+      definitions.json: |
+        {
+          "vhosts": [
+            {"name": "/"}
+          ],
+          "queues": [
+            {"name": "downloads", "vhost": "/", "durable": true, "arguments": {}},
+            {"name": "conversions", "vhost": "/", "durable": true, "arguments": {}},
+            {"name": "notifications", "vhost": "/", "durable": true, "arguments": {}}
+          ],
+          "exchanges": [
+            {"name": "media.direct", "vhost": "/", "type": "direct", "durable": true},
+            {"name": "media.dlx", "vhost": "/", "type": "direct", "durable": true}
+          ],
+          "bindings": [
+            {"source": "media.direct", "vhost": "/", "destination": "downloads", "destination_type": "queue", "routing_key": "download"},
+            {"source": "media.direct", "vhost": "/", "destination": "conversions", "destination_type": "queue", "routing_key": "convert"},
+            {"source": "media.direct", "vhost": "/", "destination": "notifications", "destination_type": "queue", "routing_key": "notify"}
+          ]
+        }

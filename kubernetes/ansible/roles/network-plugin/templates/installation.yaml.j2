@@ -12,5 +12,7 @@ spec:
         natOutgoing: {{ calico_nat_outgoing }}
         nodeSelector: "{{ calico_node_selector }}"
     nodeAddressAutodetectionV4:
-      canReach: 192.168.56.1
+      # The QEMU socket network has no VirtualBox host-only gateway. Reaching
+      # the control-plane address selects the dedicated cluster NIC on each node.
+      canReach: 192.168.56.11
       firstFound: false

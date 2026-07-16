@@ -1,0 +1,148 @@
+charts:
+  vault: "0.28.1"
+  externalSecrets: "0.10.0"
+  postgresql: "2.0.4"
+  rabbitmq: "1.6.1"
+  minio: "5.2.0"
+  redis: "1.6.19"
+  prometheusOperatorCrds: "30.0.1"
+  kubeStateMetrics: "7.8.1"
+  prometheusNodeExporter: "4.56.0"
+  grafana: "10.5.15"
+
+dashboards:
+  - key: kube-state-metrics-v2
+    gnetId: 13332
+    revision: 12
+    datasource: Prometheus
+  - key: node-exporter-full
+    gnetId: 1860
+    revision: 45
+    datasource: Prometheus
+  - key: postgresql-exporter
+    gnetId: 12485
+    revision: 1
+    datasource: Prometheus
+  - key: rabbitmq-overview
+    gnetId: 10991
+    revision: 1
+    datasource: Prometheus
+  - key: redis-overview
+    gnetId: 763
+    revision: 1
+    datasource: Prometheus
+  - key: minio-overview
+    gnetId: 10946
+    revision: 1
+    datasource: Prometheus
+
+images:
+  vault:
+    repository: hashicorp/vault
+    tag: "1.17.2"
+    pullPolicy: IfNotPresent
+  externalSecrets:
+    repository: ghcr.io/external-secrets/external-secrets
+    tag: "v0.10.0"
+    pullPolicy: IfNotPresent
+  postgresql:
+    repository: docker.io/library/postgres
+    tag: "16"
+    pullPolicy: IfNotPresent
+  postgresqlVolumePermissions:
+    repository: docker.io/library/busybox
+    tag: "1.36"
+    pullPolicy: IfNotPresent
+  rabbitmq:
+    repository: docker.io/library/rabbitmq
+    tag: "4.3.2-alpine"
+    pullPolicy: IfNotPresent
+  redis:
+    repository: docker.io/library/redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+  minio:
+    repository: quay.io/minio/minio
+    tag: "RELEASE.2024-04-18T19-09-19Z"
+    pullPolicy: IfNotPresent
+  minioClient:
+    repository: quay.io/minio/mc
+    tag: "RELEASE.2024-04-18T16-45-29Z"
+    pullPolicy: IfNotPresent
+  prometheusOperator:
+    repository: quay.io/prometheus-operator/prometheus-operator
+    tag: "v0.92.1"
+    pullPolicy: IfNotPresent
+  prometheusConfigReloader:
+    repository: quay.io/prometheus-operator/prometheus-config-reloader
+    tag: "v0.92.1"
+    pullPolicy: IfNotPresent
+  prometheus:
+    repository: quay.io/prometheus/prometheus
+    tag: "v3.13.1"
+    pullPolicy: IfNotPresent
+  prometheusVolumePermissions:
+    repository: docker.io/library/busybox
+    tag: "1.36"
+    pullPolicy: IfNotPresent
+
+persistence:
+  storageClass: local-path
+  vaultSize: 2Gi
+  postgresqlSize: 10Gi
+  rabbitmqSize: 5Gi
+  minioSize: 15Gi
+  redisSize: 1Gi
+  grafanaSize: 5Gi
+  prometheusSize: 10Gi
+
+resources:
+  externalSecrets:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  postgresql:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  rabbitmq:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  minio:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  redis:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  grafana:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  prometheus:
+    requests:
+      cpu: 300m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi

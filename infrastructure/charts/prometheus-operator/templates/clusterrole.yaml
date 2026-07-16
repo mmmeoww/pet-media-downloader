@@ -1,0 +1,127 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/instance: {{ .Release.Name }}
+rules:
+  - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - alertmanagerconfigs
+      - alertmanagers
+      - alertmanagers/finalizers
+      - alertmanagers/status
+      - podmonitors
+      - probes
+      - prometheusagents
+      - prometheusagents/finalizers
+      - prometheusagents/status
+      - prometheuses
+      - prometheuses/finalizers
+      - prometheuses/status
+      - prometheusrules
+      - prometheusrules/status
+      - scrapeconfigs
+      - scrapeconfigs/status
+      - servicemonitors
+      - servicemonitors/status
+      - podmonitors/status
+      - probes/status
+      - thanosrulers
+      - thanosrulers/finalizers
+      - thanosrulers/status
+    verbs:
+      - '*'
+  - apiGroups:
+      - apps
+    resources:
+      - statefulsets
+    verbs:
+      - '*'
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - secrets
+    verbs:
+      - '*'
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - services/finalizers
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+      - events.k8s.io
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+  - apiGroups:
+      - policy
+    resources:
+      - poddisruptionbudgets
+    verbs:
+      - '*'
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - '*'
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch

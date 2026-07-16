@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql-postgresql
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: volume-permissions
+          image: {{ printf "%s:%s" .Values.images.postgresqlVolumePermissions.repository .Values.images.postgresqlVolumePermissions.tag | quote }}
+          imagePullPolicy: {{ .Values.images.postgresqlVolumePermissions.pullPolicy | quote }}
+          command:
+            - sh
+            - -ec
+            - |
+              mkdir -p /var/lib/postgresql/data/pgdata
+              chown -R 999:999 /var/lib/postgresql/data
+              chmod 700 /var/lib/postgresql/data/pgdata
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              add:
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+              drop:
+                - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data

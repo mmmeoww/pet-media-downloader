@@ -1,0 +1,47 @@
+mode: standalone
+
+image:
+  repository: {{ .Values.images.minio.repository | quote }}
+  tag: {{ .Values.images.minio.tag | quote }}
+  pullPolicy: {{ .Values.images.minio.pullPolicy | quote }}
+
+mcImage:
+  repository: {{ .Values.images.minioClient.repository | quote }}
+  tag: {{ .Values.images.minioClient.tag | quote }}
+  pullPolicy: {{ .Values.images.minioClient.pullPolicy | quote }}
+
+rootUser: admin
+existingSecret: minio-credentials
+
+persistence:
+  enabled: true
+  size: {{ .Values.persistence.minioSize | quote }}
+  storageClass: {{ .Values.persistence.storageClass | quote }}
+
+resources:
+  requests:
+    cpu: {{ .Values.resources.minio.requests.cpu | quote }}
+    memory: {{ .Values.resources.minio.requests.memory | quote }}
+  limits:
+    cpu: {{ .Values.resources.minio.limits.cpu | quote }}
+    memory: {{ .Values.resources.minio.limits.memory | quote }}
+
+service:
+  type: ClusterIP
+  port: 9000
+  consolePort: 9001
+
+metrics:
+  serviceMonitor:
+    enabled: true
+    includeNode: true
+    public: true
+    interval: 30s
+
+buckets:
+  - name: downloads
+    policy: private
+  - name: converted
+    policy: private
+  - name: thumbnails
+    policy: private
