@@ -2,9 +2,6 @@ Vagrant.configure("2") do |config|
   # ARM64 Ubuntu cloud image compatible with the vagrant-qemu provider.
   config.vm.box = "perk/ubuntu-2204-arm64"
   config.vm.box_check_update = false
-
-  # QEMU does not provide VirtualBox shared folders. The Kubernetes nodes do
-  # not need the repository mounted, and disabling it also avoids SMB setup.
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # The qemu provider uses a user-mode NIC for SSH and a second NIC for the
